@@ -1,0 +1,18 @@
+server.port=81
+server.compression.enabled=true
+server.compression.mime-types=application/json,application/xml,text/html,text/plain
+spring.datasource.url=jdbc:mysql://localhost:3306/robot?useUnicode=true
+spring.datasource.username=root
+spring.datasource.password=password
+spring.datasource.testWhileIdle=true
+spring.datasource.validationQuery=SELECT 1
+spring.jpa.show-sql=false
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL5Dialect
+robot.host=127.0.0.1
+robot.port=80
+robot.listen.port=8080
+robot.debug=false
+robot.qq=ROBOT_SELF_QQ
+master.qq=MASTER_QQ
+managed.group.id=GROUP_ID
+admin.group.id=BACKEND_GROUP_ID

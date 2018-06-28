@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <property name="LOG_HOME" value="/robot/robot_log"/>
+    <property name="LOG_FILE" value="robot.log"/>
+    <property name="FILE_LOG_PATTERN" value="%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"/>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <Pattern>${FILE_LOG_PATTERN}</Pattern>
+        </encoder>
+    </appender>
+
+    <appender name="ROLLIN" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/${LOG_FILE}</file>
+        <encoder>
+            <Pattern>${FILE_LOG_PATTERN}</Pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/${LOG_FILE}.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="ROLLIN" />
+        <appender-ref ref="STDOUT" />
+    </root>
+    <logger name="cn.hylstudio.robot" level="info"/>
+</configuration>
