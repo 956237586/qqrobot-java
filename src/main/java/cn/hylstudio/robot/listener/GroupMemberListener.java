@@ -22,7 +22,7 @@ public class GroupMemberListener extends AbstractListener {
         if (!noticeType.equalsIgnoreCase(GROUP_MEMBER_INCREASE)) {
             return;
         }
-        if (groupId.equals(configuredGroup) ) {
+        if (groupId.equals(configuredGroup)) {
             Long qq = msg.getUserId();
             IcqHttpApi httpApi = msg.getBot().getHttpApi();
             httpApi.setGroupCard(groupId, qq, "18地区 真实姓名");
@@ -33,7 +33,9 @@ public class GroupMemberListener extends AbstractListener {
                     .add("加入本群，请阅读群公告，按格式修改名片，谢谢~~")
                     .toString();
             httpApi.sendGroupMsg(groupId, welcomeMsg);
-//            httpApi.sendPrivateMsg(qq, "欢迎加入BISTU新生群，请阅读群公告，按格式修改名片，谢谢~~");
+            new Thread(() -> {
+                httpApi.sendPrivateMsg(qq, "欢迎加入BISTU新生群，请阅读群公告，按格式修改名片，谢谢~~");
+            }).start();
         }
     }
 }
