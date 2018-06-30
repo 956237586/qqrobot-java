@@ -33,9 +33,7 @@ public class GroupMemberListener extends AbstractListener {
                     .add("加入本群，请阅读群公告，按格式修改名片，谢谢~~")
                     .toString();
             httpApi.sendGroupMsg(groupId, welcomeMsg);
-            new Thread(() -> {
-                httpApi.sendPrivateMsg(qq, "欢迎加入BISTU新生群，请阅读群公告，按格式修改名片，谢谢~~");
-            }).start();
+            httpApi.sendPrivateMsg(qq, "欢迎加入BISTU新生群，请阅读群公告，按格式修改名片，谢谢~~");
         }
     }
 }
