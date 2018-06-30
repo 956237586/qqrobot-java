@@ -82,6 +82,8 @@ public class GroupMsgListener extends AbstractListener {
                 int position = message.indexOf(" ");
                 String replyMsg = message.substring(position + 1);
                 if (keyword.equalsIgnoreCase(keywords[0]) || keyword.equalsIgnoreCase(keywords[1])) {
+                    msg.getHttpApi().sendGroupMsg(configuredGroup, replyMsg);
+                } else if (keyword.equalsIgnoreCase(keywords[2]) || keyword.equalsIgnoreCase(keywords[3])) {
                     String replyQQ = message.substring(0, position);
                     try {
                         Long replyQQId = Long.valueOf(replyQQ);
@@ -89,8 +91,6 @@ public class GroupMsgListener extends AbstractListener {
                     } catch (Exception e) {
                         LOGGER.error("parse msg error [{}]", e.getMessage(), e);
                     }
-                } else if (keyword.equalsIgnoreCase(keywords[2]) || keyword.equalsIgnoreCase(keywords[3])) {
-                    msg.getHttpApi().sendGroupMsg(configuredGroup, replyMsg);
                 }
                 break;
             }
