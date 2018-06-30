@@ -75,15 +75,25 @@ public class GroupMsgListener extends AbstractListener {
 
     private void handleAdminGroupMsg(EventGroupMessage msg) {
         String message = msg.getMessage();
-        String keyword1 = "回复";
-        String keyword2 = "hf";
-        if (message.startsWith(keyword1) || message.startsWith(keyword2)) {
-            message = message.substring(keyword1.length());
-            int position = message.indexOf(" ");
-            String replyQQ = message.substring(0, position);
-            String replyMsg = message.substring(position + 1);
-            Long replyQQId = Long.valueOf(replyQQ);
-            msg.getHttpApi().sendPrivateMsg(replyQQId, replyMsg);
+        String[] keywords = {"回复", "hf", "回复群", "hfq"};
+        for (String keyword : keywords) {
+            if (message.startsWith(keyword)) {
+                message = message.substring(keyword.length());
+                int position = message.indexOf(" ");
+                String replyMsg = message.substring(position + 1);
+                if (keyword.equalsIgnoreCase(keywords[0]) || keyword.equalsIgnoreCase(keywords[1])) {
+                    String replyQQ = message.substring(0, position);
+                    try {
+                        Long replyQQId = Long.valueOf(replyQQ);
+                        msg.getHttpApi().sendPrivateMsg(replyQQId, replyMsg);
+                    } catch (Exception e) {
+                        LOGGER.error("parse msg error [{}]", e.getMessage(), e);
+                    }
+                } else if (keyword.equalsIgnoreCase(keywords[2]) || keyword.equalsIgnoreCase(keywords[3])) {
+                    msg.getHttpApi().sendGroupMsg(configuredGroup, replyMsg);
+                }
+                break;
+            }
         }
     }
 
