@@ -75,7 +75,7 @@ public class GroupMsgListener extends AbstractListener {
 
     private void handleAdminGroupMsg(EventGroupMessage msg) {
         String message = msg.getMessage();
-        String[] keywords = {"回复", "hf", "回复群", "hfq"};
+        String[] keywords = {"回复群", "hfq", "回复", "hf",};
         for (String keyword : keywords) {
             if (message.startsWith(keyword)) {
                 message = message.substring(keyword.length());
