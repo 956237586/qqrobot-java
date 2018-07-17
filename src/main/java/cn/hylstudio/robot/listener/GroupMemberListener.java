@@ -25,7 +25,7 @@ public class GroupMemberListener extends AbstractListener {
         if (groupId.equals(configuredGroup)) {
             Long qq = msg.getUserId();
             IcqHttpApi httpApi = msg.getBot().getHttpApi();
-            httpApi.setGroupCard(groupId, qq, "18地区 真实姓名");
+            httpApi.setGroupCard(groupId, qq, "18专业 真实姓名");
             String welcomeMsg = new MessageBuilder()
                     .add("欢迎")
                     .add(new ComponentAt(qq))
