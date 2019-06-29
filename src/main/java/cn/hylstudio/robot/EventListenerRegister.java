@@ -34,7 +34,6 @@ public class EventListenerRegister {
         eventManager.registerListener(privateMsgListener);
         eventManager.registerListener(groupRequestListener);
         eventManager.registerListener(friendRequestListener);
-        eventManager.registerListener(friendRequestListener);
         eventManager.registerListener(groupMsgListener);
         eventManager.registerListener(groupMemberListener);
     }
