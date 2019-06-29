@@ -1,6 +1,7 @@
 package cn.hylstudio.robot.config;
 
 import cc.moecraft.icq.PicqBotX;
+import cc.moecraft.icq.PicqConfig;
 import cc.moecraft.icq.event.EventManager;
 import cc.moecraft.icq.sender.IcqHttpApi;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +22,10 @@ public class RobotConfig {
     @Bean
     public PicqBotX getPicqBotX() {
         // 创建机器人对象 ( 信息发送URL, 发送端口, 接收端口, 是否DEBUG )
-        PicqBotX bot = new PicqBotX(robotHost, robotPort, robotListenPort, debug);
+        PicqConfig config = new PicqConfig(robotListenPort);
+        PicqBotX bot = new PicqBotX(config);
+        bot.addAccount("xiaobing", robotHost, robotPort);
+//        PicqBotX bot = new PicqBotX(robotHost, robotPort, robotListenPort, debug);
         return bot;
     }
 
@@ -33,6 +37,6 @@ public class RobotConfig {
 
     @Bean
     public IcqHttpApi getHttpApi(PicqBotX robot) {
-        return robot.getHttpApi();
+        return robot.getAccountManager().getAccounts().get(0).getHttpApi();
     }
 }

@@ -2,7 +2,6 @@ package cn.hylstudio.robot;
 
 import cc.moecraft.icq.PicqBotX;
 import cc.moecraft.icq.event.EventManager;
-import cc.moecraft.icq.exceptions.HttpServerStartFailedException;
 import cc.moecraft.icq.exceptions.VersionIncorrectException;
 import cc.moecraft.icq.exceptions.VersionRecommendException;
 import cn.hylstudio.robot.listener.*;
@@ -32,29 +31,19 @@ public class EventListenerRegister {
     private final Logger LOGGER = LoggerFactory.getLogger(EventListenerRegister.class);
 
     public void reg() {
-        eventManager.registerListener(privateMsgListener)
-                .registerListener(groupRequestListener)
-                .registerListener(friendRequestListener)
-                .registerListener(groupMsgListener)
-                .registerListener(groupMemberListener);
+        eventManager.registerListener(privateMsgListener);
+        eventManager.registerListener(groupRequestListener);
+        eventManager.registerListener(friendRequestListener);
+        eventManager.registerListener(friendRequestListener);
+        eventManager.registerListener(groupMsgListener);
+        eventManager.registerListener(groupMemberListener);
     }
 
 
     public void init() {
         reg();
-        try {
-            LOGGER.error("robot starting");
-            // 启动机器人, 这个因为会占用线程, 所以必须放到最后
-            robot.startBot();
-        } catch (HttpServerStartFailedException e) {
-            LOGGER.error("start bot HttpServerStartFailedException [{}]", e.getMessage(), e);
-        } catch (VersionIncorrectException e) {
-            LOGGER.error("start bot VersionIncorrectException [{}]", e.getMessage(), e);
-        }
-        try {
-            robot.getHttpServer().start();
-        } catch (HttpServerStartFailedException e) {
-            LOGGER.error("start bot HttpServerStartFailedException [{}]", e.getMessage(), e);
-        }
+        LOGGER.error("robot starting");
+        // 启动机器人, 这个因为会占用线程, 所以必须放到最后
+        robot.startBot();
     }
 }

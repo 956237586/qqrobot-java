@@ -82,7 +82,7 @@
         <dependency>
             <groupId>com.github.hydevelop</groupId>
             <artifactId>PicqBotX</artifactId>
-            <version>1.0.4.8</version>
+            <version>4.10.1.928</version>
         </dependency>
     </dependencies>
     <repositories>

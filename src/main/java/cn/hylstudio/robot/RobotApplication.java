@@ -1,8 +1,5 @@
 package cn.hylstudio.robot;
 
-import cc.moecraft.icq.PicqBotX;
-import cc.moecraft.icq.exceptions.HttpServerStartFailedException;
-import cc.moecraft.icq.exceptions.VersionIncorrectException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

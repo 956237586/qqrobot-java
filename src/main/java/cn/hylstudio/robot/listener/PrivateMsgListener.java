@@ -27,7 +27,7 @@ public class PrivateMsgListener extends AbstractListener {
 
     @EventHandler
     public void debugListener(EventPrivateMessage msg) {
-        IcqHttpApi httpApi = msg.getBot().getHttpApi();
+        IcqHttpApi httpApi = msg.getHttpApi();
         Long senderId = msg.getSenderId();
 //        if (senderId.equals(masterQQ)) {
 //            ReturnData<RMessageReturnData> response = msg.respond("hi master");
