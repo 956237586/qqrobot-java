@@ -97,6 +97,7 @@ public class GroupMsgListener extends AbstractListener {
         }
     }
 
+
     private void handleGroupMsg(EventGroupMessage msg) {
         //check card
         Long senderId = msg.getSenderId();
