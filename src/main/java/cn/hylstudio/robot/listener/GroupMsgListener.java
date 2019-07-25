@@ -112,7 +112,7 @@ public class GroupMsgListener extends AbstractListener {
         }
     }
 
-    private String regex = "^[01][0-9][^ ].{1,7} [^ ].{2,30}";
+    private String regex = "^[01][0-9][^ ].{1,7} [^ ].{1,30}";
     private Pattern pattern = Pattern.compile(regex);
 
     public void test() {
@@ -128,21 +128,22 @@ public class GroupMsgListener extends AbstractListener {
         //check card
         Long senderId = msg.getSenderId();
         Long groupId = msg.getGroupId();
-        String card = "";
         if (alreadyChecked(groupId, senderId)) {
             decreaseCount(groupId, senderId);
             return;
         }
-        try {
-            card = cardCache.get(Pair.of(groupId, senderId));
-        } catch (ExecutionException e) {
-            LOGGER.error("load cardCache ExecutionException [{}]", e.getMessage(), e);
-        } catch (Exception e) {
-            LOGGER.error("load cardCache unknown Exception [{}]", e.getMessage(), e);
-        }
+        String card = "";
+        card = getGroupCard(groupId, senderId);
         Matcher matcher = pattern.matcher(card);
         boolean right = matcher.matches();
+        if (right) {
+            if ("19专业 真实姓名".equals(card)||
+                    card.endsWith("真实姓名")) {
+                right = false;
+            }
+        }
         if (!right) {
+            LOGGER.info("not matched card, card = [{}]", card);
             IcqHttpApi httpApi = msg.getHttpApi();
             String result = new MessageBuilder()
                     .add(new ComponentAt(senderId))
@@ -151,6 +152,7 @@ public class GroupMsgListener extends AbstractListener {
                     .toString();
             httpApi.sendGroupMsg(groupId, result);
         } else {
+            LOGGER.info("right card = [{}]", card);
             resetCount(groupId, senderId);
         }
     }
@@ -181,7 +183,7 @@ public class GroupMsgListener extends AbstractListener {
 
 
     private String getGroupCard(Long groupId, Long senderId) {
-        ReturnData<RGroupMemberInfo> groupMemberInfo = httpApi.getGroupMemberInfo(groupId, senderId, false);
+        ReturnData<RGroupMemberInfo> groupMemberInfo = httpApi.getGroupMemberInfo(groupId, senderId, true);
         if (groupMemberInfo == null) {
             LOGGER.warn("empty groupMemberInfo, gid = [{}], senderId = [{}]", groupId, senderId);
             return "";
