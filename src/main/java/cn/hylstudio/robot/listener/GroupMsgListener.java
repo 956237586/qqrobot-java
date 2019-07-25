@@ -1,33 +1,40 @@
 package cn.hylstudio.robot.listener;
 
-import cc.moecraft.icq.PicqBotX;
 import cc.moecraft.icq.event.EventHandler;
 import cc.moecraft.icq.event.events.message.EventGroupMessage;
-import cc.moecraft.icq.event.events.request.EventGroupAddRequest;
-import cc.moecraft.icq.event.events.request.EventGroupInviteRequest;
 import cc.moecraft.icq.sender.IcqHttpApi;
 import cc.moecraft.icq.sender.message.MessageBuilder;
 import cc.moecraft.icq.sender.message.components.ComponentAt;
 import cc.moecraft.icq.sender.returndata.ReturnData;
 import cc.moecraft.icq.sender.returndata.returnpojo.get.RGroupMemberInfo;
+import cn.hylstudio.robot.entity.GroupCardCheckRecord;
+import cn.hylstudio.robot.repo.GroupCardCheckRepo;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
-import com.sun.org.apache.xpath.internal.operations.Bool;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Component
 public class GroupMsgListener extends AbstractListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(GroupMsgListener.class);
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private GroupCardCheckRepo groupCardCheckRepo;
     @Autowired
     private IcqHttpApi httpApi;
     @Value("${robot.qq}")
@@ -37,11 +44,13 @@ public class GroupMsgListener extends AbstractListener {
     @Value("${admin.group.id}")
     private Long adminGroup;
     public static String AT_MYSELF;
-    private LoadingCache<Long, Boolean> cardCheckCache = CacheBuilder.newBuilder().expireAfterWrite(20, TimeUnit.DAYS)
-            .build(new CacheLoader<Long, Boolean>() {
+    private LoadingCache<Pair<Long, Long>, String> cardCache = CacheBuilder.newBuilder().expireAfterWrite(20, TimeUnit.DAYS)
+            .build(new CacheLoader<Pair<Long, Long>, String>() {
                 @Override
-                public Boolean load(Long senderId) throws Exception {
-                    return groupCardCheck(senderId);
+                public String load(Pair<Long, Long> pair) throws Exception {
+                    Long groupId = pair.getLeft();
+                    Long senderId = pair.getRight();
+                    return getGroupCard(groupId, senderId);
                 }
             });
 
@@ -49,6 +58,12 @@ public class GroupMsgListener extends AbstractListener {
     @PostConstruct
     public void init() {
         AT_MYSELF = String.format("[CQ:at,qq=%s]", robotQQ);
+        initDb();
+//        test();
+    }
+
+    private void initDb() {
+        jdbcTemplate.update(GroupCardCheckRecord.CREATE_SQL);
     }
 
     @EventHandler
@@ -97,19 +112,36 @@ public class GroupMsgListener extends AbstractListener {
         }
     }
 
+    private String regex = "^[01][0-9][^ ].{1,7} [^ ].{2,30}";
+    private Pattern pattern = Pattern.compile(regex);
+
+    public void test() {
+        resetCount(123L, 456L);
+        LOGGER.info("debug alreadyChecked = [{}]", alreadyChecked(123L, 456L));
+        decreaseCount(123L, 456L);
+        Optional<GroupCardCheckRecord> optional = groupCardCheckRepo.findById(String.format("%s_%s", 123L, 456L));
+        GroupCardCheckRecord groupCardCheckRecord = optional.orElseGet(null);
+        LOGGER.info("debug alreadyChecked = [{}]", groupCardCheckRecord);
+    }
 
     private void handleGroupMsg(EventGroupMessage msg) {
         //check card
         Long senderId = msg.getSenderId();
         Long groupId = msg.getGroupId();
-        boolean right = true;
-        try {
-            right = cardCheckCache.get(senderId);
-        } catch (ExecutionException e) {
-            LOGGER.error("load cardCheckCache ExecutionException [{}]", e.getMessage(), e);
-        } catch (Exception e) {
-            LOGGER.error("load cardCheckCache unknown Exception [{}]", e.getMessage(), e);
+        String card = "";
+        if (alreadyChecked(groupId, senderId)) {
+            decreaseCount(groupId, senderId);
+            return;
         }
+        try {
+            card = cardCache.get(Pair.of(groupId, senderId));
+        } catch (ExecutionException e) {
+            LOGGER.error("load cardCache ExecutionException [{}]", e.getMessage(), e);
+        } catch (Exception e) {
+            LOGGER.error("load cardCache unknown Exception [{}]", e.getMessage(), e);
+        }
+        Matcher matcher = pattern.matcher(card);
+        boolean right = matcher.matches();
         if (!right) {
             IcqHttpApi httpApi = msg.getHttpApi();
             String result = new MessageBuilder()
@@ -118,11 +150,54 @@ public class GroupMsgListener extends AbstractListener {
                     .add("名片格式不正确！")
                     .toString();
             httpApi.sendGroupMsg(groupId, result);
+        } else {
+            resetCount(groupId, senderId);
         }
     }
 
 
-    private Boolean groupCardCheck(Long senderId) {
-        return true;
+    private boolean alreadyChecked(Long groupId, Long senderId) {
+        Optional<GroupCardCheckRecord> optional = groupCardCheckRepo.findById(String.format("%s_%s", groupId, senderId));
+        return optional.isPresent();
     }
+
+    private void resetCount(Long groupId, Long senderId) {
+        GroupCardCheckRecord groupCardCheckRecord = new GroupCardCheckRecord();
+        groupCardCheckRecord.setId(String.format("%s_%s", groupId, senderId));
+        groupCardCheckRecord.setCount(1000);
+        groupCardCheckRepo.save(groupCardCheckRecord);
+    }
+
+
+    private void decreaseCount(Long groupId, Long senderId) {
+        Optional<GroupCardCheckRecord> optional = groupCardCheckRepo.findById(String.format("%s_%s", groupId, senderId));
+        GroupCardCheckRecord groupCardCheckRecord = optional.orElseGet(null);
+        if (groupCardCheckRecord == null) {
+            return;
+        }
+        groupCardCheckRecord.decreaseCount();
+        groupCardCheckRepo.save(groupCardCheckRecord);
+    }
+
+
+    private String getGroupCard(Long groupId, Long senderId) {
+        ReturnData<RGroupMemberInfo> groupMemberInfo = httpApi.getGroupMemberInfo(groupId, senderId, false);
+        if (groupMemberInfo == null) {
+            LOGGER.warn("empty groupMemberInfo, gid = [{}], senderId = [{}]", groupId, senderId);
+            return "";
+        }
+
+        RGroupMemberInfo data = groupMemberInfo.getData();
+        if (data == null) {
+            LOGGER.warn("empty member data, gid = [{}], senderId = [{}], groupMemberInfo = [{}]", groupId, senderId, groupMemberInfo);
+            return "";
+        }
+        String card = data.getCard();
+        if (StringUtils.isEmpty(card)) {
+            LOGGER.warn("empty card data, gid = [{}], senderId = [{}], groupMemberInfo = [{}]", groupId, senderId, groupMemberInfo);
+            return "";
+        }
+        return card;
+    }
+
 }
