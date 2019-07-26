@@ -16,7 +16,7 @@ public class GroupMemberListener extends AbstractListener {
     private Long configuredGroup;
 
     @EventHandler
-    public void groupMemberHandler(EventNoticeGroupMemberChange msg) {
+    public void onGroupMemberChanged(EventNoticeGroupMemberChange msg) {
         Long groupId = msg.getGroupId();
         String noticeType = msg.getNoticeType();
         if (!noticeType.equalsIgnoreCase(GROUP_MEMBER_INCREASE)) {
