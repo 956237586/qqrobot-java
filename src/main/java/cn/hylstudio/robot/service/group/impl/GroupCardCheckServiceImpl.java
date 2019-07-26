@@ -50,8 +50,12 @@ public class GroupCardCheckServiceImpl implements IGroupCardCheckService {
 
     @Override
     public boolean alreadyChecked(Long groupId, Long senderId) {
-        Optional<GroupCardCheckRecord> optional = groupCardCheckRepo.findById(getKey(groupId, senderId));
-        return optional.isPresent();
+        Optional<GroupCardCheckRecord> optional = groupCardCheckRepo.findById(getKey(groupId, senderId));;
+        GroupCardCheckRecord groupCardCheckRecord = optional.orElseGet(null);
+        if (groupCardCheckRecord == null) {
+            return false;
+        }
+        return groupCardCheckRecord.getCount() > 0;
     }
 
     @Override
