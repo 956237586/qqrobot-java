@@ -25,14 +25,14 @@ public class GroupMemberListener extends AbstractListener {
         if (groupId.equals(configuredGroup)) {
             Long qq = msg.getUserId();
             IcqHttpApi httpApi = msg.getHttpApi();
-            httpApi.setGroupCard(groupId, qq, "19地区 真实姓名");
-            String welcomeMsg = new MessageBuilder()
-                    .add("欢迎")
-                    .add(new ComponentAt(qq))
-                    .add(String.format("(%s)", qq))
-                    .add("加入本群，请阅读群公告，按格式修改名片，谢谢~~")
-                    .toString();
-            httpApi.sendGroupMsg(groupId, welcomeMsg);
+            httpApi.setGroupCard(groupId, qq, "19专业 真实姓名");
+            //String welcomeMsg = new MessageBuilder()
+                   // .add("欢迎")
+                   // .add(new ComponentAt(qq))
+                   // .add(String.format("(%s)", qq))
+                   // .add("加入本群，请阅读群公告，按格式修改名片，谢谢~~")
+                   // .toString();
+            //httpApi.sendGroupMsg(groupId, welcomeMsg);
             httpApi.sendPrivateMsg(qq, "欢迎加入BISTU新生群，请阅读群公告，按格式修改名片，谢谢~~");
         }
     }
