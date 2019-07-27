@@ -128,6 +128,7 @@ public class RevokeMsgServiceImpl implements IRevokeMsgService {
                 if (fileMatcher.matches()) {
                     String imgId = fileMatcher.group(1);
                     content = getImageUrl(imgId);
+                    sendMsg(getImageRedirectUrl(imgId));
                 }
             }
             LOGGER.info("content = [{}]", content);
@@ -145,19 +146,24 @@ public class RevokeMsgServiceImpl implements IRevokeMsgService {
 
     }
 
-    private String getImageUrl(String imgId) {
+    private String getImageRedirectUrl(String imgId) {
+        return String.format("http://robot.hylstudio.cn/img/%s", imgId);
+    }
+
+    @Override
+    public String getImageUrl(String imgId) {
         String fileIniName = String.format("D:/coolQPro/data/image/%s.cqimg", imgId);
         Ini ini = null;
         try {
             ini = new Ini(new File(fileIniName));
             return ini.get("image", "url");
         } catch (Exception e) {
-            return "emptyUrl";
+            return "http://www.baidu.com";
         }
     }
 
     private void sendMsg(String msg) {
-        ReturnData<RMessageReturnData> result = httpApi.sendGroupMsg(adminGroup, msg,true);
+        ReturnData<RMessageReturnData> result = httpApi.sendGroupMsg(adminGroup, msg, true);
         if (result == null) {
             LOGGER.warn("result is null");
             return;

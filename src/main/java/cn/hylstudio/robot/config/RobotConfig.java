@@ -24,7 +24,7 @@ public class RobotConfig {
         // 创建机器人对象 ( 信息发送URL, 发送端口, 接收端口, 是否DEBUG )
         PicqConfig config = new PicqConfig(robotListenPort);
         PicqBotX bot = new PicqBotX(config);
-        bot.addAccount("xiaobing", robotHost, robotPort);
+//        bot.addAccount("xiaobing", robotHost, robotPort);
 //        PicqBotX bot = new PicqBotX(robotHost, robotPort, robotListenPort, debug);
         return bot;
     }
