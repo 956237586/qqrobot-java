@@ -20,7 +20,7 @@ public class GroupRequestListener extends AbstractListener {
 
     @EventHandler
     //拉你入群请求事件
-    public void groupRequestHandler(EventGroupInviteRequest req) {
+    public void handleInviteRequest(EventGroupInviteRequest req) {
         if (req.getUserId().equals(masterQQ)) {
             req.accept();
         } else {
@@ -30,12 +30,11 @@ public class GroupRequestListener extends AbstractListener {
 
     @EventHandler
     //	加群请求事件
-    public void groupRequestHandler(EventGroupAddRequest request) {
+    public void handleGroupAddRequest(EventGroupAddRequest request) {
         if (request.getGroupId().equals(configuredGroup)) {
             request.accept();
         } else if (request.getGroupId().equals(647283125L)) {
             request.accept();
-
         }
     }
 }

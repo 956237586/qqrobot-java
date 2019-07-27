@@ -4,7 +4,7 @@ import cc.moecraft.icq.event.EventHandler;
 import cc.moecraft.icq.event.events.message.EventPrivateMessage;
 import cc.moecraft.icq.sender.IcqHttpApi;
 import cc.moecraft.icq.sender.message.MessageBuilder;
-import cn.hylstudio.robot.service.group.IGroupMemberInfoService;
+import cn.hylstudio.robot.service.group.IGroupMemberService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +23,10 @@ public class PrivateMsgListener extends AbstractListener {
     @Value("${master.qq}")
     private Long masterQQ;
     @Autowired
-    private IGroupMemberInfoService groupMemberInfoService;
+    private IGroupMemberService groupMemberInfoService;
 
     @EventHandler
-    public void debugListener(EventPrivateMessage msg) {
+    public void handlePrivateMsg(EventPrivateMessage msg) {
         IcqHttpApi httpApi = msg.getHttpApi();
         Long senderId = msg.getSenderId();
 //        if (senderId.equals(masterQQ)) {
@@ -34,7 +34,7 @@ public class PrivateMsgListener extends AbstractListener {
 //            return;
 //        }
         String message = msg.getMessage();
-        String groupCard = groupMemberInfoService.getGroupMemberCard(configuredGroup, senderId);
+        String groupCard = groupMemberInfoService.getGroupCard(configuredGroup, senderId);
         String prompt;
         if (groupCard == null) {
             prompt = String.format("来自(%s): ", senderId);
