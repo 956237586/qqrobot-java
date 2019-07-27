@@ -1,12 +1,17 @@
 package cn.hylstudio.robot.service.group.impl;
 
+import cc.moecraft.icq.sender.message.MessageBuilder;
 import cn.hylstudio.robot.BaseTest;
-import cn.hylstudio.robot.entity.GroupCardCheckRecord;
-import cn.hylstudio.robot.repo.GroupCardCheckRepo;
+import cn.hylstudio.robot.entity.msg.MsgRecord;
+import cn.hylstudio.robot.entity.robot.GroupCardCheckRecord;
+import cn.hylstudio.robot.repo.msg.MsgRecordRepo;
+import cn.hylstudio.robot.repo.robot.GroupCardCheckRepo;
 import cn.hylstudio.robot.service.group.IGroupCardCheckService;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
 import java.util.Optional;
 
 public class GroupMemberInfoServiceImplTest extends BaseTest {

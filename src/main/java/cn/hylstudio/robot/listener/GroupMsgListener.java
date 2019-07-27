@@ -7,6 +7,7 @@ import cc.moecraft.icq.sender.message.MessageBuilder;
 import cc.moecraft.icq.sender.message.components.ComponentAt;
 import cn.hylstudio.robot.Constant;
 import cn.hylstudio.robot.service.group.IGroupMemberService;
+import cn.hylstudio.robot.service.group.IRevokeMsgService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +15,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Component
 public class GroupMsgListener extends AbstractListener {
@@ -29,6 +28,8 @@ public class GroupMsgListener extends AbstractListener {
     private static String AT_MYSELF;
     @Autowired
     private IGroupMemberService groupMemberInfoService;
+    @Autowired
+    private IRevokeMsgService revokeMsgService;
 
     @PostConstruct
     public void init() {
@@ -62,7 +63,10 @@ public class GroupMsgListener extends AbstractListener {
 
     //TODO 重构下比较好
     private void handleAdminGroupMsg(EventGroupMessage msg) {
+        Long groupId = msg.getGroupId();
+        Long senderId = msg.getSenderId();
         String message = msg.getMessage();
+        revokeMsgService.checkRevokeCmd(senderId, groupId, msg);
         String[] keywords = {"回复群", "hfq", "回复", "hf",};
         for (String keyword : keywords) {
             if (message.startsWith(keyword)) {
@@ -89,35 +93,6 @@ public class GroupMsgListener extends AbstractListener {
         Long senderId = msg.getSenderId();
         Long groupId = msg.getGroupId();
         checkCard(msg, senderId, groupId);
-        getRevokeMsg(senderId, groupId, msg);
-
-    }
-
-    Pattern revokePattern = Pattern.compile(Constant.REVOKE_REGEX);
-    private void getRevokeMsg(Long senderId, Long groupId, EventGroupMessage msg) {
-        if (!senderId.equals(956237586L)) {
-            return;
-        }
-        String message = msg.getMessage();
-        Matcher matcher = revokePattern.matcher(message);
-        if (!matcher.matches()) {
-            LOGGER.info("msg not match revoke, msg = [{}]", message);
-            return;
-        }
-        LOGGER.info("msg matched revoke, msg = [{}]", message);
-        String atQQStr = matcher.group(1);
-        String numStr = matcher.group(2);
-        Long atQQ = 0L;
-        Integer num = 0;
-        try {
-            atQQ = Long.valueOf(atQQStr);
-            num = Integer.valueOf(numStr);
-        } catch (NumberFormatException e) {
-            return;
-        }
-        //cch@123 3
-        LOGGER.info("get revoke qq = [{}], num = [{}]", atQQ, num);
-
     }
 
     private void checkCard(EventGroupMessage msg, Long senderId, Long groupId) {

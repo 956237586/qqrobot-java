@@ -1,4 +1,4 @@
-package cn.hylstudio.robot.entity;
+package cn.hylstudio.robot.entity.robot;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

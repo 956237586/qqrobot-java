@@ -1,11 +1,12 @@
 package cn.hylstudio.robot.service.group.impl;
 
-import cn.hylstudio.robot.entity.GroupCardCheckRecord;
-import cn.hylstudio.robot.repo.GroupCardCheckRepo;
+import cn.hylstudio.robot.entity.robot.GroupCardCheckRecord;
+import cn.hylstudio.robot.repo.robot.GroupCardCheckRepo;
 import cn.hylstudio.robot.service.group.IGroupCardCheckService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
