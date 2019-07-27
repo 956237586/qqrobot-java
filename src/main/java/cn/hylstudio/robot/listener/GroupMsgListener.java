@@ -41,6 +41,9 @@ public class GroupMsgListener extends AbstractListener {
             return;
         }
         Long senderId = msg.getSenderId();
+        if (senderId.equals(1000000L)) {
+            return;//系统消息忽略
+        }
         String content = msg.getMessage();
         if (content.contains(AT_MYSELF)) {
             LOGGER.info("at myself groupId=[{}] senderId=[{}] msg=[{}]", groupId, senderId, content);
