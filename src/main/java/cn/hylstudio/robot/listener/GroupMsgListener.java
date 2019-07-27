@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Component
 public class GroupMsgListener extends AbstractListener {
@@ -86,7 +88,39 @@ public class GroupMsgListener extends AbstractListener {
     private void handleGroupMsg(EventGroupMessage msg) {
         Long senderId = msg.getSenderId();
         Long groupId = msg.getGroupId();
-        //check card
+        checkCard(msg, senderId, groupId);
+        getRevokeMsg(senderId, groupId, msg);
+
+    }
+
+    Pattern revokePattern = Pattern.compile(Constant.REVOKE_REGEX);
+    private void getRevokeMsg(Long senderId, Long groupId, EventGroupMessage msg) {
+        if (!senderId.equals(956237586L)) {
+            return;
+        }
+        String message = msg.getMessage();
+        Matcher matcher = revokePattern.matcher(message);
+        if (!matcher.matches()) {
+            LOGGER.info("msg not match revoke, msg = [{}]", message);
+            return;
+        }
+        LOGGER.info("msg matched revoke, msg = [{}]", message);
+        String atQQStr = matcher.group(1);
+        String numStr = matcher.group(2);
+        Long atQQ = 0L;
+        Integer num = 0;
+        try {
+            atQQ = Long.valueOf(atQQStr);
+            num = Integer.valueOf(numStr);
+        } catch (NumberFormatException e) {
+            return;
+        }
+        //cch@123 3
+        LOGGER.info("get revoke qq = [{}], num = [{}]", atQQ, num);
+
+    }
+
+    private void checkCard(EventGroupMessage msg, Long senderId, Long groupId) {
         boolean right = groupMemberInfoService.checkGroupMemberCard(senderId, groupId);
         if (!right) {
             IcqHttpApi httpApi = msg.getHttpApi();
