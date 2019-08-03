@@ -163,7 +163,7 @@ public class RevokeMsgServiceImpl implements IRevokeMsgService {
     }
 
     private void sendMsg(String msg) {
-        ReturnData<RMessageReturnData> result = httpApi.sendGroupMsg(adminGroup, msg, true);
+        ReturnData<RMessageReturnData> result = httpApi.sendGroupMsg(adminGroup, msg);
         if (result == null) {
             LOGGER.warn("result is null");
             return;
