@@ -51,10 +51,11 @@ public class GroupMemberServiceImpl implements IGroupMemberService {
     public boolean checkGroupMemberCard(Long senderId, Long groupId) {
         if (groupCardCheckService.alreadyChecked(groupId, senderId)) {
             groupCardCheckService.decreaseCount(groupId, senderId);
+            LOGGER.info("already checked groupId = [{}], senderId = [{}]", groupId, senderId);
             return true;
         }
-
         String card = getGroupCard(groupId, senderId);
+        LOGGER.info("get group card, groupId = [{}], senderId = [{}], card = [{}]", groupId, senderId, card);
         boolean right = groupCardCheckService.checkGroupMemberCard(groupId, senderId, card);
         if (!right) {
             LOGGER.info("not matched card, card = [{}]", card);

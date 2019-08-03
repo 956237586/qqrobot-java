@@ -28,13 +28,13 @@ public class GroupRequestListener extends AbstractListener {
         }
     }
 
-    @EventHandler
-    //	加群请求事件
-    public void handleGroupAddRequest(EventGroupAddRequest request) {
-        if (request.getGroupId().equals(configuredGroup)) {
-            request.accept();
-        } else if (request.getGroupId().equals(647283125L)) {
-            request.accept();
-        }
-    }
+//    @EventHandler
+//    //	加群请求事件
+//    public void handleGroupAddRequest(EventGroupAddRequest request) {
+//        if (request.getGroupId().equals(configuredGroup)) {
+//            request.accept();
+//        } else if (request.getGroupId().equals(adminGroup)) {
+//            request.accept();
+//        }
+//    }
 }
